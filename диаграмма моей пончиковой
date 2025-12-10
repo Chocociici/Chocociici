@@ -1,0 +1,124 @@
+erDiagram
+   
+    USERS {
+        int id PK "Идентификатор"
+        string email "Email (уникальный)"
+        string password "Пароль"
+        string name "Имя"
+        string role "Роль (user/admin)"
+        string avatar "Аватар (текст/ссылка)"
+        string phone "Телефон"
+        string address "Адрес"
+        datetime created_at "Дата регистрации"
+    }
+    
+    PRODUCTS {
+        int id PK "Идентификатор"
+        string name "Название"
+        string description "Описание"
+        decimal price "Цена"
+        string category "Категория (donuts/drinks)"
+        string image "URL изображения"
+        decimal rating "Рейтинг"
+        int stock "Остаток на складе"
+        datetime created_at "Дата добавления"
+        boolean is_active "Активен"
+    }
+    
+    ORDERS {
+        int id PK "Идентификатор"
+        int user_id FK "ID пользователя"
+        decimal total "Общая сумма"
+        string status "Статус (new/processing/completed/cancelled)"
+        string address "Адрес доставки"
+        datetime order_date "Дата заказа"
+        datetime delivery_date "Дата доставки"
+        string payment_method "Способ оплаты"
+        string payment_status "Статус оплаты"
+    }
+    
+ 
+    CART_ITEMS {
+        int id PK "Идентификатор"
+        int user_id FK "ID пользователя"
+        int product_id FK "ID товара"
+        int quantity "Количество"
+        datetime added_at "Дата добавления"
+    }
+    
+    ORDER_ITEMS {
+        int id PK "Идентификатор"
+        int order_id FK "ID заказа"
+        int product_id FK "ID товара"
+        int quantity "Количество"
+        decimal price "Цена на момент заказа"
+        string product_name "Название на момент заказа"
+    }
+    
+    FAVORITES {
+        int id PK "Идентификатор"
+        int user_id FK "ID пользователя"
+        int product_id FK "ID товара"
+        datetime added_at "Дата добавления"
+    }
+    
+    PRODUCT_CATEGORIES {
+        int id PK "Идентификатор"
+        string name "Название категории"
+        string slug "Slug (URL)"
+        string description "Описание категории"
+        int parent_id "Родительская категория (для вложенности)"
+    }
+    
+    PRODUCT_TO_CATEGORIES {
+        int product_id FK "ID товара"
+        int category_id FK "ID категории"
+    }
+    
+    REVIEWS {
+        int id PK "Идентификатор"
+        int user_id FK "ID пользователя"
+        int product_id FK "ID товара"
+        int order_id FK "ID заказа (подтверждение покупки)"
+        int rating "Оценка (1-5)"
+        string comment "Комментарий"
+        datetime created_at "Дата отзыва"
+        boolean is_approved "Одобрен"
+    }
+    
+    PROMO_CODES {
+        int id PK "Идентификатор"
+        string code "Код промокода"
+        string discount_type "Тип скидки (percentage/fixed)"
+        decimal discount_value "Значение скидки"
+        decimal min_order "Минимальная сумма заказа"
+        datetime valid_from "Действует с"
+        datetime valid_to "Действует до"
+        int usage_limit "Лимит использований"
+        int used_count "Использовано раз"
+        boolean is_active "Активен"
+    }
+    
+    ORDER_PROMOCODES {
+        int order_id FK "ID заказа"
+        int promo_id FK "ID промокода"
+        decimal discount_applied "Примененная скидка"
+    }
+    
+   
+    USERS ||--o{ ORDERS : "создает"
+    USERS ||--o{ CART_ITEMS : "добавляет_в_корзину"
+    USERS ||--o{ FAVORITES : "добавляет_в_избранное"
+    USERS ||--o{ REVIEWS : "оставляет_отзыв"
+    
+    ORDERS ||--o{ ORDER_ITEMS : "содержит"
+    
+    PRODUCTS ||--o{ CART_ITEMS : "в_корзине_у"
+    PRODUCTS ||--o{ ORDER_ITEMS : "в_заказе"
+    PRODUCTS ||--o{ FAVORITES : "в_избранном_у"
+    PRODUCTS ||--o{ REVIEWS : "имеет_отзывы"
+    PRODUCTS }o--o{ PRODUCT_CATEGORIES : "принадлежит_категориям" via PRODUCT_TO_CATEGORIES
+    
+    PRODUCT_CATEGORIES ||--o{ PRODUCT_CATEGORIES : "подкатегория"
+    
+    PROMO_CODES }o--o{ ORDERS : "применяется_к" via ORDER_PROMOCODES
